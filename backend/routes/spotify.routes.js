@@ -8,9 +8,8 @@ const router = express.Router();
 const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
 const REDIRECT_URI = process.env.SPOTIFY_REDIRECT_URI;
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5500'; // Ajustar según donde se corra el index.html
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5500';
 
-// 1. Iniciar el login con Spotify
 router.get('/login', (req, res) => {
     const scope = 'user-library-read';
     const authUrl = 'https://accounts.spotify.com/authorize?' +
@@ -23,7 +22,6 @@ router.get('/login', (req, res) => {
     res.redirect(authUrl);
 });
 
-// 2. Callback de Spotify después de iniciar sesión
 router.get('/callback', async (req, res) => {
     const code = req.query.code || null;
 
@@ -32,7 +30,6 @@ router.get('/callback', async (req, res) => {
     }
 
     try {
-        // Intercambiar el código por un access_token
         const tokenResponse = await axios.post('https://accounts.spotify.com/api/token', 
             querystring.stringify({
                 code: code,
@@ -48,7 +45,6 @@ router.get('/callback', async (req, res) => {
 
         const accessToken = tokenResponse.data.access_token;
 
-        // Obtener canciones guardadas del usuario (Liked Songs)
         const tracksResponse = await axios.get('https://api.spotify.com/v1/me/tracks?limit=50', {
             headers: {
                 'Authorization': `Bearer ${accessToken}`
@@ -57,27 +53,24 @@ router.get('/callback', async (req, res) => {
 
         const items = tracksResponse.data.items;
 
-        // Guardar las canciones en la base de datos
         for (const item of items) {
             const track = item.track;
-            // Evitar duplicados (opcional: buscar primero si existe)
             const exists = await Cancion.findOne({ where: { cancion: track.name, artista: track.artists[0].name } });
             
             if (!exists) {
                 await Cancion.create({
                     cancion: track.name,
                     artista: track.artists.map(a => a.name).join(', '),
-                    genero: 'otro', // Spotify no provee género a nivel de track, le ponemos 'otro'
-                    favorita: true  // Son liked songs, así que son favoritas
+                    genero: 'otro',
+                    favorita: true
                 });
             }
         }
 
-        // Redirigir de vuelta al frontend con un mensaje de éxito
         res.redirect(`${FRONTEND_URL}?import=success`);
 
     } catch (error) {
-        console.error('Error en la integración con Spotify:', error.response ? error.response.data : error.message);
+        console.error(error);
         res.redirect(`${FRONTEND_URL}?error=fallo_importacion`);
     }
 });

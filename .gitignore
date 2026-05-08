@@ -13,3 +13,6 @@ Thumbs.db
 # Ignorar base de datos local SQLite (si quedara alguna)
 *.sqlite
 *.sqlite3
+
+# Ignorar guia local
+GUIA_DESPLIEGUE.md
