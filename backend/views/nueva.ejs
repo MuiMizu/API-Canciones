@@ -1,0 +1,81 @@
+<%- include('partials/head') %>
+
+<div class="form-container">
+    <h2>Agregar Nueva Canción</h2>
+    <form id="formNueva" class="glass-form">
+        <div class="form-group">
+            <label for="cancion">Nombre de la Canción</label>
+            <input type="text" id="cancion" name="cancion" required placeholder="Ej: PARAISO">
+        </div>
+
+        <div class="form-group">
+            <label for="artista">Artista</label>
+            <input type="text" id="artista" name="artista" required placeholder="Ej: Milo J">
+        </div>
+
+        <div class="form-group">
+            <label for="genero">Género Musical</label>
+            <select id="genero" name="genero" required class="custom-select">
+                <option value="" disabled selected>Selecciona un género</option>
+                <% generos.forEach(g => { %>
+                    <option value="<%= g %>"><%= g.toUpperCase() %></option>
+                <% }) %>
+            </select>
+        </div>
+
+        <div class="form-group heart-toggle-container">
+            <span class="heart-label">¿Es tu favorita?</span>
+            <input type="checkbox" id="favorita" name="favorita" class="hidden-checkbox">
+            <label for="favorita" class="btn-heart" id="heart-label">🩶</label>
+        </div>
+
+        <script>
+            document.getElementById('favorita').addEventListener('change', function() {
+                document.getElementById('heart-label').textContent = this.checked ? '❤️' : '🩶';
+            });
+        </script>
+
+        <div class="form-actions">
+            <a href="/" class="btn-cancel">Cancelar</a>
+            <button type="submit" class="btn-submit">Guardar Canción</button>
+        </div>
+    </form>
+</div>
+
+<script>
+document.getElementById('formNueva').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.querySelector('.btn-submit');
+    btn.disabled = true;
+    btn.textContent = 'Guardando...';
+
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData.entries());
+    // checkbox might be missing if unchecked
+    data.favorita = data.favorita === 'on';
+
+    try {
+        const res = await fetch('/api/canciones', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        if (res.ok) {
+            showToast('Canción agregada correctamente');
+            setTimeout(() => window.location.href = '/', 1500);
+        } else {
+            const error = await res.json();
+            showToast(error.error || 'Error al guardar', true);
+            btn.disabled = false;
+            btn.textContent = 'Guardar Canción';
+        }
+    } catch(err) {
+        showToast('Error de conexión', true);
+        btn.disabled = false;
+        btn.textContent = 'Guardar Canción';
+    }
+});
+</script>
+
+<%- include('partials/footer') %>

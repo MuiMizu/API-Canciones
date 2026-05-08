@@ -1,0 +1,15 @@
+# Ignorar dependencias de Node
+node_modules/
+backend/node_modules/
+
+# Ignorar variables de entorno
+.env
+backend/.env
+
+# Ignorar archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Ignorar base de datos local SQLite (si quedara alguna)
+*.sqlite
+*.sqlite3

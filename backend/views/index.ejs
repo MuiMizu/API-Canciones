@@ -1,0 +1,99 @@
+<%- include('partials/head') %>
+
+<div class="actions-bar">
+    <form action="/" method="GET" class="filter-form" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+        <select name="genero" class="custom-select" onchange="this.form.submit()">
+            <option value="">Todos los géneros</option>
+            <% generos.forEach(g => { %>
+                <option value="<%= g %>" <%= generoFiltro === g ? 'selected' : '' %>><%= g.toUpperCase() %></option>
+            <% }) %>
+        </select>
+
+        <div class="custom-select checkbox-group" style="padding: 0.6rem 1rem; margin: 0;">
+            <input type="checkbox" id="filtro-favoritas" name="favoritas" onchange="this.form.submit()" <%= soloFavoritas ? 'checked' : '' %>>
+            <label for="filtro-favoritas" style="color: var(--text-primary); font-weight: 600; font-size: 0.95rem;">Solo ❤️ Favoritas</label>
+        </div>
+    </form>
+</div>
+
+<div class="songs-grid">
+    <% if (canciones.length === 0) { %>
+        <div class="empty-state">
+            <p>No hay canciones todavía. ¡Agrega tu primera canción favorita!</p>
+        </div>
+    <% } else { %>
+        <% canciones.forEach(cancion => { %>
+            <div class="card" id="cancion-<%= cancion.id %>">
+                <div class="card-content">
+                    <div class="card-header">
+                        <span class="badge badge-<%= cancion.genero %>"><%= cancion.genero.toUpperCase() %></span>
+                        <span class="favorite-icon <%= cancion.favorita ? 'is-fav' : '' %>" onclick="toggleFavorito(<%= cancion.id %>)" style="cursor: pointer;" title="Marcar/Desmarcar favorita">
+                            <%= cancion.favorita ? '❤️' : '🩶' %>
+                        </span>
+                    </div>
+                    <h2><%= cancion.cancion %></h2>
+                    <p class="artist"><%= cancion.artista %></p>
+                    <p class="date">Agregada: <%= cancion.creado_en %></p>
+                </div>
+                <div class="card-actions">
+                    <a href="/editar/<%= cancion.id %>" class="btn-action btn-edit">Editar</a>
+                    <button onclick="eliminarCancion(<%= cancion.id %>)" class="btn-action btn-delete">Eliminar</button>
+                </div>
+            </div>
+        <% }) %>
+    <% } %>
+</div>
+
+<script>
+async function toggleFavorito(id) {
+    try {
+        const res = await fetch(`/api/canciones/${id}/favorita`, {
+            method: 'PATCH'
+        });
+        if (res.ok) {
+            const data = await res.json();
+            const heartSpan = document.querySelector(`#cancion-${id} .favorite-icon`);
+            if (data.favorita) {
+                heartSpan.textContent = '❤️';
+                heartSpan.classList.add('is-fav');
+            } else {
+                heartSpan.textContent = '🩶';
+                heartSpan.classList.remove('is-fav');
+            }
+        } else {
+            showToast('Error al actualizar', true);
+        }
+    } catch(e) {
+        showToast('Error de conexión', true);
+    }
+}
+
+async function eliminarCancion(id) {
+    if (confirm('¿Estás seguro de que deseas eliminar esta canción?')) {
+        try {
+            const res = await fetch(`/api/canciones/${id}`, {
+                method: 'DELETE'
+            });
+            if (res.ok) {
+                const card = document.getElementById(`cancion-${id}`);
+                card.style.animation = 'fadeOut 0.3s ease forwards';
+                setTimeout(() => card.remove(), 300);
+                showToast('Canción eliminada correctamente');
+                
+                // If no more cards, we might want to refresh
+                setTimeout(() => {
+                    if(document.querySelectorAll('.card').length === 0) {
+                        window.location.reload();
+                    }
+                }, 400);
+            } else {
+                showToast('Error al eliminar', true);
+            }
+        } catch(e) {
+            showToast('Error de conexión', true);
+        }
+    }
+}
+</script>
+
+<%- include('partials/footer') %>
