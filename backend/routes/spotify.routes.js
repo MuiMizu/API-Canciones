@@ -70,7 +70,8 @@ router.get('/callback', async (req, res) => {
         res.redirect(`${FRONTEND_URL}?import=success`);
 
     } catch (error) {
-        console.error(error);
+        const errData = error.response?.data || error.message;
+        console.error('❌ Error en Spotify callback:', JSON.stringify(errData));
         res.redirect(`${FRONTEND_URL}?error=fallo_importacion`);
     }
 });
