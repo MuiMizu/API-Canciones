@@ -49,6 +49,14 @@ const Cancion = sequelize.define('Cancion', {
     favorita: {
         type: DataTypes.BOOLEAN,
         defaultValue: false
+    },
+    imagen_url: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    audio_url: {
+        type: DataTypes.STRING,
+        allowNull: true
     }
 }, {
     timestamps: true,

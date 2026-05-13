@@ -62,7 +62,9 @@ router.get('/callback', async (req, res) => {
                     cancion: track.name,
                     artista: track.artists.map(a => a.name).join(', '),
                     genero: 'otro',
-                    favorita: true
+                    favorita: true,
+                    imagen_url: track.album.images[0]?.url,
+                    audio_url: track.preview_url
                 });
             }
         }

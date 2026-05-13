@@ -50,7 +50,9 @@ songForm.addEventListener('submit', async (e) => {
         cancion: document.getElementById('songName').value,
         artista: document.getElementById('songArtist').value,
         genero: document.getElementById('songGenre').value,
-        favorita: document.getElementById('songFavorite').checked
+        favorita: document.getElementById('songFavorite').checked,
+        imagen_url: document.getElementById('songImage').value,
+        audio_url: document.getElementById('songAudio').value
     };
 
     try {
@@ -106,22 +108,34 @@ function renderSongs(canciones) {
 
     songsContainer.innerHTML = canciones.map(c => {
         const isSelected = selectedIds.has(c.id);
+        const imageStyle = c.imagen_url ? `background-image: url('${c.imagen_url}'); background-size: cover; background-position: center;` : '';
+        
         return `
         <div class="col-md-6 col-lg-4">
             <div class="card song-card ${isSelected ? 'selected' : ''}" id="card-${c.id}">
                 <div class="select-checkbox" onclick="toggleSelection(${c.id}, event)">
                     <i class="fas fa-check"></i>
                 </div>
-                <div class="card-img-top">
-                    <i class="fas fa-compact-disc"></i>
+                <div class="card-img-top" style="${imageStyle}">
+                    ${c.imagen_url ? '' : '<i class="fas fa-compact-disc"></i>'}
                 </div>
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start">
-                        <h5 class="song-title">${c.cancion}</h5>
+                        <h5 class="song-title text-truncate" title="${c.cancion}">${c.cancion}</h5>
                         <i class="fas fa-star favorite-star ${c.favorita ? 'active' : ''}" onclick="toggleFavorite(${c.id}, event)"></i>
                     </div>
-                    <p class="song-artist">${c.artista}</p>
-                    <div class="d-flex justify-content-between align-items-center mt-3">
+                    <p class="song-artist text-truncate">${c.artista}</p>
+                    
+                    ${c.audio_url ? `
+                        <div class="audio-container mt-2 mb-3">
+                            <audio controls class="w-100" style="height: 30px;">
+                                <source src="${c.audio_url}" type="audio/mpeg">
+                                Tu navegador no soporta el elemento de audio.
+                            </audio>
+                        </div>
+                    ` : ''}
+
+                    <div class="d-flex justify-content-between align-items-center mt-auto">
                         <span class="badge-genre">${c.genero}</span>
                         <div class="actions">
                             <button class="btn btn-sm text-primary me-2" onclick='editSong(${JSON.stringify(c).replace(/'/g, "&apos;")}, event)' title="Editar">
@@ -238,6 +252,8 @@ window.editSong = function(cancion, event) {
     document.getElementById('songArtist').value = cancion.artista;
     document.getElementById('songGenre').value = cancion.genero;
     document.getElementById('songFavorite').checked = cancion.favorita;
+    document.getElementById('songImage').value = cancion.imagen_url || '';
+    document.getElementById('songAudio').value = cancion.audio_url || '';
     
     modalTitle.textContent = 'Editar Canción';
     songModal.show();
@@ -253,5 +269,5 @@ function debounce(func, timeout = 300) {
 }
 
 function showToast(message) {
-    alert(message); // Podría mejorarse con un toast real de Bootstrap
+    alert(message);
 }

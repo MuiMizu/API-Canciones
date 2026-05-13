@@ -53,7 +53,9 @@ const create = async (req, res, next) => {
             cancion,
             artista,
             genero: genero.toLowerCase(),
-            favorita: favorita === 'true' || favorita === true || favorita === 'on'
+            favorita: favorita === 'true' || favorita === true || favorita === 'on',
+            imagen_url: req.body.imagen_url,
+            audio_url: req.body.audio_url
         });
         
         res.status(201).json(newCancion);
@@ -75,7 +77,9 @@ const update = async (req, res, next) => {
             cancion,
             artista,
             genero: genero.toLowerCase(),
-            favorita: favorita === 'true' || favorita === true || favorita === 'on'
+            favorita: favorita === 'true' || favorita === true || favorita === 'on',
+            imagen_url: req.body.imagen_url,
+            audio_url: req.body.audio_url
         });
         
         res.status(200).json(cancionModel);
