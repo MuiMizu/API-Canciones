@@ -40,13 +40,13 @@ const initDB = async () => {
                 console.log('Datos importados desde canciones.json');
             }
         }
-
-        app.listen(PORT, () => {
-            console.log(`🚀 Servidor backend listo para producción en http://localhost:${PORT}`);
-        });
     } catch (error) {
         console.error('No se pudo conectar a la base de datos:', error);
     }
 };
 
-initDB();
+app.listen(PORT, () => {
+    console.log(`🚀 Servidor backend listo en puerto ${PORT}`);
+    initDB();
+});
+
