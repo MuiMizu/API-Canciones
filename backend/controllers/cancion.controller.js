@@ -2,7 +2,8 @@ const { Cancion } = require('../models/cancion.model');
 
 const getAll = async (req, res, next) => {
     try {
-        const { genero, favoritas } = req.query;
+        const { genero, favoritas, search } = req.query;
+        const { Op } = require('sequelize');
         let where = {};
         
         if (genero) {
@@ -10,6 +11,12 @@ const getAll = async (req, res, next) => {
         }
         if (favoritas === 'true' || favoritas === 'on') {
             where.favorita = true;
+        }
+        if (search) {
+            where[Op.or] = [
+                { cancion: { [Op.like]: `%${search}%` } },
+                { artista: { [Op.like]: `%${search}%` } }
+            ];
         }
 
         const canciones = await Cancion.findAll({ 
@@ -105,11 +112,39 @@ const remove = async (req, res, next) => {
     }
 };
 
+const bulkDelete = async (req, res, next) => {
+    try {
+        const { ids } = req.body;
+        if (!ids || !Array.isArray(ids)) {
+            return res.status(400).json({ error: 'Se requiere un array de IDs' });
+        }
+        await Cancion.destroy({ where: { id: ids } });
+        res.status(200).json({ message: `${ids.length} canciones eliminadas` });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const bulkFavorite = async (req, res, next) => {
+    try {
+        const { ids, favorita } = req.body;
+        if (!ids || !Array.isArray(ids)) {
+            return res.status(400).json({ error: 'Se requiere un array de IDs' });
+        }
+        await Cancion.update({ favorita: favorita }, { where: { id: ids } });
+        res.status(200).json({ message: `${ids.length} canciones actualizadas` });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = { 
     getAll, 
     getById, 
     create, 
     update, 
     toggleFavorita, 
-    remove 
+    remove,
+    bulkDelete,
+    bulkFavorite
 };

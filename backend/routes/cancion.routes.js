@@ -11,4 +11,8 @@ router.put('/:id', validateCancion, cancionController.update);
 router.patch('/:id/favorita', cancionController.toggleFavorita);
 router.delete('/:id', cancionController.remove);
 
+// Rutas masivas
+router.post('/bulk-delete', cancionController.bulkDelete);
+router.post('/bulk-favorite', cancionController.bulkFavorite);
+
 module.exports = router;

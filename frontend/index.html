@@ -3,111 +3,398 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎵 API Canciones Favoritas</title>
+    <title>Colección de Música Favorita</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f8f9fa; }
-        .hero { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem 0; border-radius: 0 0 20px 20px; margin-bottom: 2rem; }
-        .song-card { transition: transform 0.2s; border: none; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .song-card:hover { transform: translateY(-5px); }
-        .favorite-btn { cursor: pointer; color: #ffc107; font-size: 1.5rem; }
-        .favorite-btn.inactive { color: #dee2e6; }
+        :root {
+            --primary-dark: #0a192f;
+            --secondary-dark: #172a45;
+            --accent-blue: #3066be;
+            --text-white: #ffffff;
+            --bg-light: #f4f7f6;
+            --navy-blue: #001f3f;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--primary-dark);
+            margin: 0;
+            padding-bottom: 100px;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(180deg, var(--navy-blue) 0%, var(--primary-dark) 100%);
+            padding: 80px 0 140px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: var(--bg-light);
+            clip-path: polygon(0 100%, 100% 100%, 100% 0);
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 10px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            font-weight: 300;
+        }
+
+        /* Search & Filter Bar */
+        .filter-container {
+            margin-top: -60px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .filter-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            border: none;
+        }
+
+        .form-select, .form-control {
+            border-radius: 12px;
+            padding: 12px 15px;
+            border: 1px solid #e0e0e0;
+            font-weight: 500;
+        }
+
+        .btn-custom {
+            border-radius: 12px;
+            padding: 12px 25px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary-navy {
+            background-color: var(--navy-blue);
+            color: white;
+            border: none;
+        }
+
+        .btn-primary-navy:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-spotify {
+            background-color: #1DB954;
+            color: white;
+            border: none;
+        }
+
+        .btn-spotify:hover {
+            background-color: #1aa34a;
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        /* Song Cards */
+        .song-grid {
+            margin-top: 40px;
+        }
+
+        .song-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+            position: relative;
+            height: 100%;
+        }
+
+        .song-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .card-img-top {
+            height: 180px;
+            background: linear-gradient(45deg, var(--secondary-dark), var(--accent-blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.2);
+            font-size: 4rem;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .song-title {
+            font-weight: 700;
+            font-size: 1.25rem;
+            margin-bottom: 5px;
+            color: var(--primary-dark);
+        }
+
+        .song-artist {
+            color: #6c757d;
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+        }
+
+        .badge-genre {
+            background: #f0f4f8;
+            color: var(--accent-blue);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* Multi-selection Styles */
+        .select-checkbox {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            border: 2px solid white;
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(5px);
+            cursor: pointer;
+            z-index: 5;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: transparent;
+        }
+
+        .song-card.selected .select-checkbox {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+            color: white;
+        }
+
+        .song-card.selected {
+            border: 2px solid var(--accent-blue);
+        }
+
+        /* Floating Action Bar */
+        .selection-bar {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--primary-dark);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1000;
+        }
+
+        .selection-bar.active {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .selection-count {
+            font-weight: 600;
+            border-right: 1px solid rgba(255,255,255,0.2);
+            padding-right: 20px;
+        }
+
+        /* Modal Customization */
+        .modal-content {
+            border-radius: 25px;
+            border: none;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            background: var(--primary-dark);
+            color: white;
+            border: none;
+            padding: 25px;
+        }
+
+        .btn-close {
+            filter: invert(1) grayscale(100%) brightness(200%);
+        }
+
+        .favorite-star {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #ccc;
+            transition: color 0.2s;
+        }
+
+        .favorite-star.active {
+            color: #ffc107;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.5rem; }
+            .selection-bar { width: 90%; border-radius: 20px; flex-wrap: wrap; justify-content: center; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="hero text-center shadow-sm">
+    <!-- Hero Section -->
+    <header class="hero-section text-center">
         <div class="container">
-            <h1 class="display-4 fw-bold">🎧 Mi Colección de Música</h1>
-            <p class="lead">Gestiona tus canciones favoritas</p>
+            <h1 class="hero-title">Colección de Música Favorita</h1>
+            <p class="hero-subtitle">Explora y gestiona tus temas preferidos con un diseño premium</p>
         </div>
-    </div>
+    </header>
 
-    <div class="container">
-        <div class="row mb-4 align-items-center bg-white p-3 rounded shadow-sm mx-0">
-            <div class="col-md-3 mb-2 mb-md-0">
-                <button class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#songModal" id="btnNueva">
-                    ➕ Nueva
-                </button>
-            </div>
-            <div class="col-md-3 mb-2 mb-md-0">
-                <button class="btn btn-success w-100" id="btnSpotify" onclick="window.location.href='https://api-canciones-yf16.onrender.com/api/spotify/login'">
-                    🎧 Importar Spotify
-                </button>
-            </div>
-            <div class="col-md-3 mb-2 mb-md-0">
-                <select class="form-select" id="filterGenero">
-                    <option value="">Todos los géneros</option>
-                    <option value="pop">Pop</option>
-                    <option value="rock">Rock</option>
-                    <option value="reggaeton">Reggaeton</option>
-                    <option value="hip hop">Hip Hop</option>
-                    <option value="electronica">Electrónica</option>
-                    <option value="jazz">Jazz</option>
-                    <option value="clasica">Clásica</option>
-                    <option value="otro">Otro</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <div class="form-check form-switch d-flex align-items-center h-100">
-                    <input class="form-check-input me-2 mt-0" type="checkbox" id="filterFavoritas">
-                    <label class="form-check-label mb-0" for="filterFavoritas">Solo favoritas</label>
+    <!-- Filters & Main Actions -->
+    <main class="container">
+        <div class="filter-container">
+            <div class="filter-card shadow">
+                <div class="row g-3 align-items-center">
+                    <div class="col-lg-3 col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text bg-transparent border-end-0"><i class="fas fa-search text-muted"></i></span>
+                            <input type="text" class="form-control border-start-0" id="searchSong" placeholder="Buscar canción...">
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <select class="form-select" id="filterGenero">
+                            <option value="">Géneros</option>
+                            <option value="pop">Pop</option>
+                            <option value="rock">Rock</option>
+                            <option value="reggaeton">Reggaeton</option>
+                            <option value="hip hop">Hip Hop</option>
+                            <option value="electronica">Electrónica</option>
+                            <option value="jazz">Jazz</option>
+                            <option value="clasica">Clásica</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <div class="form-check form-switch d-flex align-items-center h-100 ps-5">
+                            <input class="form-check-input me-2 mt-0" type="checkbox" id="filterFavoritas">
+                            <label class="form-check-label mb-0 fw-bold" for="filterFavoritas">Favoritas</label>
+                        </div>
+                    </div>
+                    <div class="col-lg-5 col-md-6 text-md-end">
+                        <div class="d-flex gap-2 justify-content-md-end">
+                            <button class="btn btn-spotify btn-custom" id="btnSpotify">
+                                <i class="fab fa-spotify me-2"></i> Spotify
+                            </button>
+                            <button class="btn btn-primary-navy btn-custom" data-bs-toggle="modal" data-bs-target="#songModal" id="btnNueva">
+                                <i class="fas fa-plus me-2"></i> Nueva
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="row" id="songsContainer">
+        <!-- Songs Grid -->
+        <div class="row song-grid g-4" id="songsContainer">
+            <!-- Loading Spinner -->
             <div class="text-center w-100 mt-5">
                 <div class="spinner-border text-primary" role="status">
                     <span class="visually-hidden">Cargando...</span>
                 </div>
             </div>
         </div>
+    </main>
+
+    <!-- Selection Bar -->
+    <div class="selection-bar" id="selectionBar">
+        <div class="selection-count"><span id="selectedCount">0</span> seleccionadas</div>
+        <button class="btn btn-sm btn-outline-light border-0" id="btnBulkFavorite">
+            <i class="fas fa-star me-1 text-warning"></i> Favorito
+        </button>
+        <button class="btn btn-sm btn-outline-light border-0" id="btnBulkUnfavorite">
+            <i class="far fa-star me-1"></i> Quitar
+        </button>
+        <button class="btn btn-sm btn-outline-danger border-0" id="btnBulkDelete">
+            <i class="fas fa-trash-alt me-1"></i> Eliminar
+        </button>
+        <button class="btn btn-sm btn-outline-light border-0" id="btnCancelSelection">
+            <i class="fas fa-times"></i>
+        </button>
     </div>
 
+    <!-- Modal Form -->
     <div class="modal fade" id="songModal" tabindex="-1">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalTitle">Agregar Canción</h5>
+                    <h5 class="modal-title fw-bold" id="modalTitle">Agregar Canción</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body p-4">
                     <form id="songForm">
                         <input type="hidden" id="songId">
                         <div class="mb-3">
-                            <label class="form-label">Nombre de la Canción</label>
-                            <input type="text" class="form-control" id="songName" required>
+                            <label class="form-label fw-600">Nombre de la Canción</label>
+                            <input type="text" class="form-control" id="songName" placeholder="Ej: Bohemian Rhapsody" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Artista</label>
-                            <input type="text" class="form-control" id="songArtist" required>
+                            <label class="form-label fw-600">Artista</label>
+                            <input type="text" class="form-control" id="songArtist" placeholder="Ej: Queen" required>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Género</label>
-                            <select class="form-select" id="songGenre" required>
-                                <option value="pop">Pop</option>
-                                <option value="rock">Rock</option>
-                                <option value="reggaeton">Reggaeton</option>
-                                <option value="hip hop">Hip Hop</option>
-                                <option value="electronica">Electrónica</option>
-                                <option value="jazz">Jazz</option>
-                                <option value="clasica">Clásica</option>
-                                <option value="otro">Otro</option>
-                            </select>
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <label class="form-label fw-600">Género</label>
+                                <select class="form-select" id="songGenre" required>
+                                    <option value="pop">Pop</option>
+                                    <option value="rock">Rock</option>
+                                    <option value="reggaeton">Reggaeton</option>
+                                    <option value="hip hop">Hip Hop</option>
+                                    <option value="electronica">Electrónica</option>
+                                    <option value="jazz">Jazz</option>
+                                    <option value="clasica">Clásica</option>
+                                    <option value="otro">Otro</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end justify-content-center pb-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="songFavorite">
+                                    <label class="form-check-label fw-bold">Favorita</label>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" id="songFavorite">
-                            <label class="form-check-label">Es favorita</label>
-                        </div>
-                        <button type="submit" class="btn btn-success w-100">Guardar</button>
+                        <button type="submit" class="btn btn-primary-navy btn-custom w-100 mt-3">Guardar Canción</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="app.js"></script>
 </body>
