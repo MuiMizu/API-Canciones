@@ -4,8 +4,17 @@ const morgan = require('morgan');
 const cors = require('cors');
 
 console.log('🛠️ Verificando variables de entorno...');
-if (!process.env.SPOTIFY_CLIENT_ID) console.error('❌ ERROR: SPOTIFY_CLIENT_ID no está definido');
-if (!process.env.SPOTIFY_CLIENT_SECRET) console.error('❌ ERROR: SPOTIFY_CLIENT_SECRET no está definido');
+if (!process.env.SPOTIFY_CLIENT_ID) {
+    console.error('❌ ERROR: SPOTIFY_CLIENT_ID no está definido');
+} else {
+    console.log(`✅ ID cargado (inicio): ${process.env.SPOTIFY_CLIENT_ID.substring(0, 4)}...`);
+}
+
+if (!process.env.SPOTIFY_CLIENT_SECRET) {
+    console.error('❌ ERROR: SPOTIFY_CLIENT_SECRET no está definido');
+} else {
+    console.log(`✅ Secret cargado (inicio): ${process.env.SPOTIFY_CLIENT_SECRET.substring(0, 4)}...`);
+}
 const { sequelize, Cancion } = require('./models/cancion.model');
 const cancionRoutes = require('./routes/cancion.routes');
 const spotifyRoutes = require('./routes/spotify.routes');
