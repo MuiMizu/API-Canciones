@@ -63,29 +63,47 @@ router.get('/callback', async (req, res) => {
         const accessToken = tokenResponse.data.access_token;
 
         // 1. Obtener las canciones guardadas
+        console.log('📡 Solicitando canciones a Spotify...');
         const tracksResponse = await axios.get('https://api.spotify.com/v1/me/tracks?limit=50', {
             headers: { 'Authorization': `Bearer ${accessToken}` }
         });
 
         const items = tracksResponse.data.items;
+        console.log(`✅ Spotify devolvió ${items.length} canciones.`);
+
+        if (items.length === 0) {
+            console.log('⚠️ No se encontraron canciones en la biblioteca del usuario.');
+            return res.redirect(`${FRONTEND_URL}?import=empty`);
+        }
         
         // 2. Obtener IDs de artistas únicos para consultar sus géneros
-        const artistIds = [...new Set(items.map(item => item.track.artists[0].id))].join(',');
-        
-        const artistsResponse = await axios.get(`https://api.spotify.com/v1/artists?ids=${artistIds}`, {
-            headers: { 'Authorization': `Bearer ${accessToken}` }
-        });
-        
-        // Crear un mapa de ArtistID -> Genero para búsqueda rápida
-        const artistGenreMap = {};
-        artistsResponse.data.artists.forEach(artist => {
-            artistGenreMap[artist.id] = mapSpotifyGenres(artist.genres);
-        });
+        const artistIds = [...new Set(items.map(item => item.track.artists[0].id))].filter(id => id).join(',');
+        let artistGenreMap = {};
+
+        if (artistIds) {
+            console.log('📡 Consultando géneros de artistas...');
+            const artistsResponse = await axios.get(`https://api.spotify.com/v1/artists?ids=${artistIds}`, {
+                headers: { 'Authorization': `Bearer ${accessToken}` }
+            });
+            
+            artistsResponse.data.artists.forEach(artist => {
+                if (artist) artistGenreMap[artist.id] = mapSpotifyGenres(artist.genres);
+            });
+        }
 
         // 3. Guardar las canciones con su género detectado
+        let createdCount = 0;
+        let skippedCount = 0;
+
         for (const item of items) {
             const track = item.track;
-            const exists = await Cancion.findOne({ where: { cancion: track.name, artista: track.artists[0].name } });
+            // Búsqueda más flexible para evitar duplicados falsos
+            const exists = await Cancion.findOne({ 
+                where: { 
+                    cancion: track.name, 
+                    artista: track.artists[0].name 
+                } 
+            });
             
             if (!exists) {
                 const detectedGenre = artistGenreMap[track.artists[0].id] || 'otro';
@@ -98,10 +116,14 @@ router.get('/callback', async (req, res) => {
                     imagen_url: track.album.images[0]?.url,
                     audio_url: track.preview_url
                 });
+                createdCount++;
+            } else {
+                skippedCount++;
             }
         }
 
-        res.redirect(`${FRONTEND_URL}?import=success`);
+        console.log(`🚀 Importación finalizada: ${createdCount} creadas, ${skippedCount} saltadas.`);
+        res.redirect(`${FRONTEND_URL}?import=success&count=${createdCount}`);
 
     } catch (error) {
         const errData = error.response?.data || error.message;
