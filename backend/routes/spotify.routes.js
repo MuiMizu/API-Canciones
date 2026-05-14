@@ -84,18 +84,23 @@ router.get('/callback', async (req, res) => {
         }
 
         // 2. Obtener IDs de artistas únicos para consultar sus géneros
-        const artistIds = [...new Set(items.map(item => item.track.artists[0].id))].filter(id => id).join(',');
+        const artistIds = [...new Set(items.map(item => item.track.artists[0].id))].filter(id => id).slice(0, 50).join(',');
         let artistGenreMap = {};
 
         if (artistIds) {
-            console.log('📡 Consultando géneros de artistas...');
-            const artistsResponse = await axios.get(`https://api.spotify.com/v1/artists?ids=${artistIds}`, {
-                headers: { 'Authorization': `Bearer ${accessToken}` }
-            });
+            try {
+                console.log('📡 Consultando géneros de artistas...');
+                const artistsResponse = await axios.get(`https://api.spotify.com/v1/artists?ids=${artistIds}`, {
+                    headers: { 'Authorization': `Bearer ${accessToken}` }
+                });
 
-            artistsResponse.data.artists.forEach(artist => {
-                if (artist) artistGenreMap[artist.id] = mapSpotifyGenres(artist.genres);
-            });
+                artistsResponse.data.artists.forEach(artist => {
+                    if (artist) artistGenreMap[artist.id] = mapSpotifyGenres(artist.genres);
+                });
+                console.log('✅ Géneros de artistas procesados.');
+            } catch (genreError) {
+                console.error('⚠️ Error al consultar géneros (403), continuando con géneros por defecto.');
+            }
         }
 
         // 3. Guardar las canciones con su género detectado
