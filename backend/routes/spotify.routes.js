@@ -30,7 +30,7 @@ const mapSpotifyGenres = (spotifyGenres) => {
 router.get('/login', (req, res) => {
     // Detectar la URL base dinámicamente (Local o Render)
     const host = req.get('host');
-    const protocol = req.protocol;
+    const protocol = req.protocol; // Ahora detectará https correctamente
     const dynamicRedirectUri = `${protocol}://${host}/api/spotify/callback`;
     
     console.log(`📡 Iniciando login con Redirect URI: ${dynamicRedirectUri}`);

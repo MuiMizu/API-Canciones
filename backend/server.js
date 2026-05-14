@@ -13,6 +13,7 @@ app.use(morgan('dev'));
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.set('trust proxy', 1); // Confiar en el proxy de Render para detectar HTTPS
 
 app.use('/api/canciones', cancionRoutes);
 app.use('/api/spotify', spotifyRoutes);
