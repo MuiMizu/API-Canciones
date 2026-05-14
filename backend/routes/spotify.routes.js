@@ -28,12 +28,10 @@ const mapSpotifyGenres = (spotifyGenres) => {
 };
 
 router.get('/login', (req, res) => {
-    // Detectar la URL base dinámicamente (Local o Render)
-    const host = req.get('host');
-    const protocol = req.protocol;
-    const dynamicRedirectUri = `${protocol}://${host}/api/spotify/callback`;
-
-    console.log(`📡 Iniciando login con Redirect URI: ${dynamicRedirectUri}`);
+    // Forzamos la URL exacta que tienes en tu Dashboard de Spotify
+    const dynamicRedirectUri = 'https://api-canciones-yf16.onrender.com/api/spotify/callback';
+    
+    console.log(`📡 Iniciando login con Redirect URI fija: ${dynamicRedirectUri}`);
 
     const scope = 'user-library-read';
     const authUrl = 'https://accounts.spotify.com/authorize?' +
@@ -48,9 +46,7 @@ router.get('/login', (req, res) => {
 
 router.get('/callback', async (req, res) => {
     const code = req.query.code || null;
-    const host = req.get('host');
-    const protocol = req.protocol;
-    const dynamicRedirectUri = `${protocol}://${host}/api/spotify/callback`;
+    const dynamicRedirectUri = 'https://api-canciones-yf16.onrender.com/api/spotify/callback';
 
     if (!code) {
         return res.redirect(`${FRONTEND_URL}?error=codigo_no_proveido`);
