@@ -28,29 +28,40 @@ const mapSpotifyGenres = (spotifyGenres) => {
 };
 
 router.get('/login', (req, res) => {
+    // Detectar la URL base dinámicamente (Local o Render)
+    const host = req.get('host');
+    const protocol = req.protocol;
+    const dynamicRedirectUri = `${protocol}://${host}/api/spotify/callback`;
+    
+    console.log(`📡 Iniciando login con Redirect URI: ${dynamicRedirectUri}`);
+
     const scope = 'user-library-read';
     const authUrl = 'https://accounts.spotify.com/authorize?' +
         querystring.stringify({
             response_type: 'code',
             client_id: CLIENT_ID,
             scope: scope,
-            redirect_uri: REDIRECT_URI,
+            redirect_uri: dynamicRedirectUri,
         });
     res.redirect(authUrl);
 });
 
 router.get('/callback', async (req, res) => {
     const code = req.query.code || null;
+    const host = req.get('host');
+    const protocol = req.protocol;
+    const dynamicRedirectUri = `${protocol}://${host}/api/spotify/callback`;
 
     if (!code) {
         return res.redirect(`${FRONTEND_URL}?error=codigo_no_proveido`);
     }
 
     try {
+        console.log('📡 Intercambiando código por token...');
         const tokenResponse = await axios.post('https://accounts.spotify.com/api/token', 
             querystring.stringify({
                 code: code,
-                redirect_uri: REDIRECT_URI,
+                redirect_uri: dynamicRedirectUri,
                 grant_type: 'authorization_code'
             }), {
                 headers: {

@@ -22,7 +22,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('import') === 'success') {
-        showToast('¡Canciones de Spotify importadas!');
+        const count = urlParams.get('count') || '0';
+        showToast(`¡Se han importado ${count} canciones correctamente!`);
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    if (urlParams.get('error')) {
+        alert('Hubo un error al importar desde Spotify. Revisa la configuración de tus credenciales y el Redirect URI.');
         window.history.replaceState({}, document.title, window.location.pathname);
     }
 });
