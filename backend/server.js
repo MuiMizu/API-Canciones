@@ -21,8 +21,9 @@ app.use(errorHandler);
 
 const initDB = async () => {
     try {
-        await sequelize.sync({ force: false });
-        console.log('Base de datos MySQL sincronizada correctamente.');
+        // Usamos alter: true para que se agreguen las columnas nuevas (imagen_url, audio_url) si no existen
+        await sequelize.sync({ alter: true });
+        console.log('Base de datos MySQL sincronizada y actualizada correctamente.');
 
         const count = await Cancion.count();
         if (count === 0) {
