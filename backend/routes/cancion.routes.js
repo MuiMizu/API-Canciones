@@ -1,17 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const cancionController = require('../controllers/cancion.controller');
-const { validateCancion } = require('../middlewares/validators');
 
 router.get('/', cancionController.getAll);
-
 router.get('/:id', cancionController.getById);
-router.post('/', validateCancion, cancionController.create);
-router.put('/:id', validateCancion, cancionController.update);
+
+// Rutas masivas y de estado
 router.patch('/:id/favorita', cancionController.toggleFavorita);
 router.delete('/:id', cancionController.remove);
-
-// Rutas masivas
 router.post('/bulk-delete', cancionController.bulkDelete);
 router.post('/bulk-favorite', cancionController.bulkFavorite);
 

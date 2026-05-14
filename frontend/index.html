@@ -305,13 +305,10 @@
                             <label class="form-check-label mb-0 fw-bold" for="filterFavoritas">Favoritas</label>
                         </div>
                     </div>
-                    <div class="col-lg-5 col-md-6 text-md-end">
+                    <div class="col-lg-7 col-md-6 text-md-end">
                         <div class="d-flex gap-2 justify-content-md-end">
                             <button class="btn btn-spotify btn-custom" id="btnSpotify">
-                                <i class="fab fa-spotify me-2"></i> Spotify
-                            </button>
-                            <button class="btn btn-primary-navy btn-custom" data-bs-toggle="modal" data-bs-target="#songModal" id="btnNueva">
-                                <i class="fas fa-plus me-2"></i> Nueva
+                                <i class="fab fa-spotify me-2"></i> Importar desde Spotify
                             </button>
                         </div>
                     </div>
@@ -347,60 +344,6 @@
         </button>
     </div>
 
-    <!-- Modal Form -->
-    <div class="modal fade" id="songModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="modalTitle">Agregar Canción</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <form id="songForm">
-                        <input type="hidden" id="songId">
-                        <div class="mb-3">
-                            <label class="form-label fw-600">Nombre de la Canción</label>
-                            <input type="text" class="form-control" id="songName" placeholder="Ej: Bohemian Rhapsody" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-600">Artista</label>
-                            <input type="text" class="form-control" id="songArtist" placeholder="Ej: Queen" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-600">URL de Imagen (Carátula)</label>
-                            <input type="url" class="form-control" id="songImage" placeholder="https://ejemplo.com/foto.jpg">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-600">URL de Audio (MP3)</label>
-                            <input type="url" class="form-control" id="songAudio" placeholder="https://ejemplo.com/musica.mp3">
-                        </div>
-                        <div class="row mb-3">
-                            <div class="col-md-8">
-                                <label class="form-label fw-600">Género</label>
-                                <select class="form-select" id="songGenre" required>
-                                    <option value="pop">Pop</option>
-                                    <option value="rock">Rock</option>
-                                    <option value="reggaeton">Reggaeton</option>
-                                    <option value="hip hop">Hip Hop</option>
-                                    <option value="electronica">Electrónica</option>
-                                    <option value="jazz">Jazz</option>
-                                    <option value="clasica">Clásica</option>
-                                    <option value="otro">Otro</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4 d-flex align-items-end justify-content-center pb-2">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="songFavorite">
-                                    <label class="form-check-label fw-bold">Favorita</label>
-                                </div>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-primary-navy btn-custom w-100 mt-3">Guardar Canción</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

@@ -4,9 +4,6 @@ const API_URL = window.location.hostname === 'localhost' || window.location.host
     : 'https://api-canciones-yf16.onrender.com/api/canciones';
 
 const songsContainer = document.getElementById('songsContainer');
-const songModal = new bootstrap.Modal(document.getElementById('songModal'));
-const songForm = document.getElementById('songForm');
-const modalTitle = document.getElementById('modalTitle');
 const selectionBar = document.getElementById('selectionBar');
 const selectedCountText = document.getElementById('selectedCount');
 
@@ -34,44 +31,6 @@ document.addEventListener('DOMContentLoaded', () => {
 document.getElementById('filterGenero').addEventListener('change', fetchSongs);
 document.getElementById('filterFavoritas').addEventListener('change', fetchSongs);
 document.getElementById('searchSong').addEventListener('input', debounce(fetchSongs, 500));
-
-// Botón Nueva Canción
-document.getElementById('btnNueva').addEventListener('click', () => {
-    songForm.reset();
-    document.getElementById('songId').value = '';
-    modalTitle.textContent = 'Agregar Canción';
-});
-
-// Guardar Canción (Crear/Editar)
-songForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const id = document.getElementById('songId').value;
-    const data = {
-        cancion: document.getElementById('songName').value,
-        artista: document.getElementById('songArtist').value,
-        genero: document.getElementById('songGenre').value,
-        favorita: document.getElementById('songFavorite').checked,
-        imagen_url: document.getElementById('songImage').value,
-        audio_url: document.getElementById('songAudio').value
-    };
-
-    try {
-        const method = id ? 'PUT' : 'POST';
-        const url = id ? `${API_URL}/${id}` : API_URL;
-        
-        await fetch(url, {
-            method: method,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
-        
-        songModal.hide();
-        fetchSongs();
-    } catch (error) {
-        console.error(error);
-        alert('Error al guardar la canción');
-    }
-});
 
 // Obtener Canciones
 async function fetchSongs() {
@@ -138,9 +97,6 @@ function renderSongs(canciones) {
                     <div class="d-flex justify-content-between align-items-center mt-auto">
                         <span class="badge-genre">${c.genero}</span>
                         <div class="actions">
-                            <button class="btn btn-sm text-primary me-2" onclick='editSong(${JSON.stringify(c).replace(/'/g, "&apos;")}, event)' title="Editar">
-                                <i class="fas fa-edit"></i>
-                            </button>
                             <button class="btn btn-sm text-danger" onclick="deleteSong(${c.id}, event)" title="Eliminar">
                                 <i class="fas fa-trash"></i>
                             </button>
@@ -243,20 +199,6 @@ async function deleteSong(id, event) {
     } catch (error) {
         console.error(error);
     }
-}
-
-window.editSong = function(cancion, event) {
-    if (event) event.stopPropagation();
-    document.getElementById('songId').value = cancion.id;
-    document.getElementById('songName').value = cancion.cancion;
-    document.getElementById('songArtist').value = cancion.artista;
-    document.getElementById('songGenre').value = cancion.genero;
-    document.getElementById('songFavorite').checked = cancion.favorita;
-    document.getElementById('songImage').value = cancion.imagen_url || '';
-    document.getElementById('songAudio').value = cancion.audio_url || '';
-    
-    modalTitle.textContent = 'Editar Canción';
-    songModal.show();
 }
 
 // Utils

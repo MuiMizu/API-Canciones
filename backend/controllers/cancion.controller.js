@@ -45,49 +45,6 @@ const getById = async (req, res, next) => {
     }
 };
 
-const create = async (req, res, next) => {
-    try {
-        const { cancion, artista, genero, favorita } = req.body;
-        
-        const newCancion = await Cancion.create({
-            cancion,
-            artista,
-            genero: genero.toLowerCase(),
-            favorita: favorita === 'true' || favorita === true || favorita === 'on',
-            imagen_url: req.body.imagen_url,
-            audio_url: req.body.audio_url
-        });
-        
-        res.status(201).json(newCancion);
-    } catch (error) {
-        next(error);
-    }
-};
-
-const update = async (req, res, next) => {
-    try {
-        const cancionModel = await Cancion.findByPk(req.params.id);
-        if (!cancionModel) {
-            return res.status(404).json({ error: 'Canción no encontrada' });
-        }
-
-        const { cancion, artista, genero, favorita } = req.body;
-        
-        await cancionModel.update({
-            cancion,
-            artista,
-            genero: genero.toLowerCase(),
-            favorita: favorita === 'true' || favorita === true || favorita === 'on',
-            imagen_url: req.body.imagen_url,
-            audio_url: req.body.audio_url
-        });
-        
-        res.status(200).json(cancionModel);
-    } catch (error) {
-        next(error);
-    }
-};
-
 const toggleFavorita = async (req, res, next) => {
     try {
         const cancion = await Cancion.findByPk(req.params.id);
@@ -145,8 +102,6 @@ const bulkFavorite = async (req, res, next) => {
 module.exports = { 
     getAll, 
     getById, 
-    create, 
-    update, 
     toggleFavorita, 
     remove,
     bulkDelete,
