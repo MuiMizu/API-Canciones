@@ -13,9 +13,9 @@ const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5500';
 // Función para mapear los géneros de Spotify a las categorías de la app
 const mapSpotifyGenres = (spotifyGenres) => {
     if (!spotifyGenres || spotifyGenres.length === 0) return 'otro';
-    
+
     const genresStr = spotifyGenres.join(' ').toLowerCase();
-    
+
     if (genresStr.includes('rock') || genresStr.includes('metal') || genresStr.includes('punk')) return 'rock';
     if (genresStr.includes('reggaeton') || genresStr.includes('trap latino') || genresStr.includes('urbano') || genresStr.includes('perreo')) return 'reggaeton';
     if (genresStr.includes('pop') || genresStr.includes('dance')) return 'pop';
@@ -23,16 +23,16 @@ const mapSpotifyGenres = (spotifyGenres) => {
     if (genresStr.includes('electronica') || genresStr.includes('house') || genresStr.includes('techno') || genresStr.includes('edm')) return 'electronica';
     if (genresStr.includes('jazz')) return 'jazz';
     if (genresStr.includes('classical') || genresStr.includes('clasica')) return 'clasica';
-    
+
     return 'otro';
 };
 
 router.get('/login', (req, res) => {
     // Detectar la URL base dinámicamente (Local o Render)
     const host = req.get('host');
-    const protocol = req.protocol; // Ahora detectará https correctamente
+    const protocol = req.protocol;
     const dynamicRedirectUri = `${protocol}://${host}/api/spotify/callback`;
-    
+
     console.log(`📡 Iniciando login con Redirect URI: ${dynamicRedirectUri}`);
 
     const scope = 'user-library-read';
@@ -58,17 +58,17 @@ router.get('/callback', async (req, res) => {
 
     try {
         console.log('📡 Intercambiando código por token...');
-        const tokenResponse = await axios.post('https://accounts.spotify.com/api/token', 
+        const tokenResponse = await axios.post('https://accounts.spotify.com/api/token',
             querystring.stringify({
                 code: code,
                 redirect_uri: dynamicRedirectUri,
                 grant_type: 'authorization_code'
             }), {
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'Authorization': 'Basic ' + (Buffer.from(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64'))
-                }
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Authorization': 'Basic ' + (Buffer.from(CLIENT_ID + ':' + CLIENT_SECRET).toString('base64'))
             }
+        }
         );
 
         const accessToken = tokenResponse.data.access_token;
@@ -86,7 +86,7 @@ router.get('/callback', async (req, res) => {
             console.log('⚠️ No se encontraron canciones en la biblioteca del usuario.');
             return res.redirect(`${FRONTEND_URL}?import=empty`);
         }
-        
+
         // 2. Obtener IDs de artistas únicos para consultar sus géneros
         const artistIds = [...new Set(items.map(item => item.track.artists[0].id))].filter(id => id).join(',');
         let artistGenreMap = {};
@@ -96,7 +96,7 @@ router.get('/callback', async (req, res) => {
             const artistsResponse = await axios.get(`https://api.spotify.com/v1/artists?ids=${artistIds}`, {
                 headers: { 'Authorization': `Bearer ${accessToken}` }
             });
-            
+
             artistsResponse.data.artists.forEach(artist => {
                 if (artist) artistGenreMap[artist.id] = mapSpotifyGenres(artist.genres);
             });
@@ -109,16 +109,16 @@ router.get('/callback', async (req, res) => {
         for (const item of items) {
             const track = item.track;
             // Búsqueda más flexible para evitar duplicados falsos
-            const exists = await Cancion.findOne({ 
-                where: { 
-                    cancion: track.name, 
-                    artista: track.artists[0].name 
-                } 
+            const exists = await Cancion.findOne({
+                where: {
+                    cancion: track.name,
+                    artista: track.artists[0].name
+                }
             });
-            
+
             if (!exists) {
                 const detectedGenre = artistGenreMap[track.artists[0].id] || 'otro';
-                
+
                 await Cancion.create({
                     cancion: track.name,
                     artista: track.artists.map(a => a.name).join(', '),
@@ -139,7 +139,8 @@ router.get('/callback', async (req, res) => {
     } catch (error) {
         const errData = error.response?.data || error.message;
         console.error('❌ Error en Spotify callback:', JSON.stringify(errData));
-        res.redirect(`${FRONTEND_URL}?error=fallo_importacion`);
+        const errMsg = encodeURIComponent(typeof errData === 'object' ? JSON.stringify(errData) : errData);
+        res.redirect(`${FRONTEND_URL}?error=true&msg=${errMsg}`);
     }
 });
 

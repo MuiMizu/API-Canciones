@@ -28,7 +28,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (urlParams.get('error')) {
-        alert('Hubo un error al importar desde Spotify. Revisa la configuración de tus credenciales y el Redirect URI.');
+        const msg = urlParams.get('msg') || 'Error desconocido';
+        alert('Error de Spotify: ' + decodeURIComponent(msg));
         window.history.replaceState({}, document.title, window.location.pathname);
     }
 });
