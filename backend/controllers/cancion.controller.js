@@ -2,13 +2,10 @@ const { Cancion } = require('../models/cancion.model');
 
 const getAll = async (req, res, next) => {
     try {
-        const { genero, favoritas, search } = req.query;
+        const { favoritas, search } = req.query;
         const { Op } = require('sequelize');
         let where = {};
         
-        if (genero) {
-            where.genero = genero.toLowerCase();
-        }
         if (favoritas === 'true' || favoritas === 'on') {
             where.favorita = true;
         }

@@ -35,19 +35,16 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Event Listeners para Filtros
-document.getElementById('filterGenero').addEventListener('change', fetchSongs);
 document.getElementById('filterFavoritas').addEventListener('change', fetchSongs);
 document.getElementById('searchSong').addEventListener('input', debounce(fetchSongs, 500));
 
 // Obtener Canciones
 async function fetchSongs() {
     try {
-        const genero = document.getElementById('filterGenero').value;
         const favoritas = document.getElementById('filterFavoritas').checked;
         const search = document.getElementById('searchSong').value;
         
         let query = new URLSearchParams();
-        if (genero) query.append('genero', genero);
         if (favoritas) query.append('favoritas', 'on');
         if (search) query.append('search', search);
 
@@ -101,8 +98,7 @@ function renderSongs(canciones) {
                         </div>
                     ` : ''}
 
-                    <div class="d-flex justify-content-between align-items-center mt-auto">
-                        <span class="badge-genre">${c.genero}</span>
+                    <div class="d-flex justify-content-end align-items-center mt-auto">
                         <div class="actions">
                             <button class="btn btn-sm text-danger" onclick="deleteSong(${c.id}, event)" title="Eliminar">
                                 <i class="fas fa-trash"></i>
