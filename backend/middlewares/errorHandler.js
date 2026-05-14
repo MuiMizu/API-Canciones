@@ -10,7 +10,7 @@ const errorHandler = (err, req, res, next) => {
 
     res.status(500).json({ 
         error: 'Ocurrió un error interno en el servidor',
-        mensaje: process.env.NODE_ENV === 'development' ? err.message : 'Error inesperado'
+        mensaje: err.message // Mostramos el error real para debuggear
     });
 };
 
