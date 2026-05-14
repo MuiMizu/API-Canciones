@@ -44,9 +44,6 @@ const Cancion = sequelize.define('Cancion', {
         type: DataTypes.STRING,
         allowNull: true
     },
-    audio_url: {
-        type: DataTypes.STRING,
-        allowNull: true
     }
 }, {
     timestamps: true,

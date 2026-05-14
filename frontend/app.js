@@ -87,17 +87,8 @@ function renderSongs(canciones) {
                         <h5 class="song-title text-truncate" title="${c.cancion}">${c.cancion}</h5>
                         <i class="fas fa-star favorite-star ${c.favorita ? 'active' : ''}" onclick="toggleFavorite(${c.id}, event)"></i>
                     </div>
-                    <p class="song-artist text-truncate">${c.artista}</p>
+                    <p class="song-artist text-truncate mb-3">${c.artista}</p>
                     
-                    ${c.audio_url ? `
-                        <div class="audio-container mt-2 mb-3">
-                            <audio controls class="w-100" style="height: 30px;">
-                                <source src="${c.audio_url}" type="audio/mpeg">
-                                Tu navegador no soporta el elemento de audio.
-                            </audio>
-                        </div>
-                    ` : ''}
-
                     <div class="d-flex justify-content-end align-items-center mt-auto">
                         <div class="actions">
                             <button class="btn btn-sm text-danger" onclick="deleteSong(${c.id}, event)" title="Eliminar">
